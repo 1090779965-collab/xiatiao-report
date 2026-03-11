@@ -176,6 +176,16 @@
                 <div class="panel-title">💡 方案策划助手</div>
                 <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
+            
+            <!-- 参考资料上传 -->
+            <div style="background: #f0f7ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <label style="margin-top:0;">📎 参考资料（可选，上传Word/PDF自动提取内容）</label>
+                <input type="file" id="proposalFile" accept=".doc,.docx,.pdf" onchange="handleProposalFile(event)" style="margin-top:8px;">
+                <div id="proposalFileInfo" style="display:none; margin-top:12px; padding:12px; background:white; border-radius:6px; border-left:3px solid #667eea;">
+                    <strong>✅ 已上传：</strong><span id="proposalFileName"></span>
+                </div>
+            </div>
+            
             <div class="row">
                 <div>
                     <label>📌 方案名称（必填）</label>
@@ -411,14 +421,63 @@
             showResult(report, title + '会议纪要');
         }
         
+        let proposalRefText = ''; // 参考资料内容
+        
+        // 方案策划 - 处理参考文件
+        async function handleProposalFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['.doc', '.docx', '.pdf'];
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            
+            if (!validTypes.includes(ext)) {
+                alert('仅支持 .doc, .docx, .pdf 文件');
+                return;
+            }
+            
+            document.getElementById('proposalFileName').textContent = file.name;
+            document.getElementById('proposalFileInfo').style.display = 'block';
+            
+            // 显示加载状态
+            document.getElementById('proposalFileInfo').innerHTML = '<strong>⏳ 正在解析：</strong>' + file.name + '<br><span style="color:#666;">请稍候...</span>';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    proposalRefText = result.text;
+                    document.getElementById('proposalFileInfo').innerHTML = '<strong>✅ 已解析：</strong>' + file.name + '<br><span style="color:#666;font-size:12px;">内容已提取，可作为方案参考</span>';
+                } else {
+                    alert('解析失败: ' + result.error);
+                }
+            } catch (err) {
+                alert('连接失败，请确保本地服务已启动');
+            }
+        }
+        
         function generateProposal() {
             const name = document.getElementById('proposalName').value;
             const dept = document.getElementById('proposalDept').value;
             const goal = document.getElementById('proposalGoal').value;
-            const background = document.getElementById('proposalBackground').value;
+            
+            // 如果没有填写背景分析，但上传了参考资料，使用参考资料作为背景
+            let background = document.getElementById('proposalBackground').value;
+            if (!background && proposalRefText) {
+                background = '（参考上传资料）' + proposalRefText.substring(0, 500) + (proposalRefText.length > 500 ? '...' : '');
+            }
+            
             const strategy = document.getElementById('proposalStrategy').value;
             
-            if (!name || !goal || !background || !strategy) { alert('请填写方案名称、目标、背景和策略'); return; }
+            if ((!name || !goal || !strategy) || (!background && !proposalRefText)) { alert('请填写方案名称、目标、策略，以及背景分析（或上传参考资料）'); return; }
             
             const plan = document.getElementById('proposalPlan').value;
             const budget = document.getElementById('proposalBudget').value;
