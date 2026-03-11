@@ -7,81 +7,100 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { text-align: center; color: white; margin-bottom: 8px; font-size: 28px; }
-        .subtitle { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 24px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 8px; font-size: 32px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 24px; font-size: 16px; }
         
-        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .tool-card { background: white; border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: white; border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
         .tool-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
         .tool-card.active { border: 3px solid #667eea; }
-        .tool-icon { font-size: 40px; margin-bottom: 12px; }
-        .tool-name { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 6px; }
-        .tool-desc { font-size: 13px; color: #666; }
+        .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); }
+        .tool-icon { font-size: 48px; margin-bottom: 12px; }
+        .tool-name { font-size: 20px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .tool-desc { font-size: 14px; color: #666; line-height: 1.5; }
         
         .panel { background: white; border-radius: 16px; padding: 32px; display: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .panel.active { display: block; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .panel-title { font-size: 22px; font-weight: 600; color: #333; }
-        .close-btn { background: #f0f0f0; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+        .panel-title { font-size: 24px; font-weight: 600; color: #333; }
+        .close-btn { background: #f0f0f0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .close-btn:hover { background: #e0e0e0; }
         
-        label { display: block; margin: 16px 0 8px; color: #444; font-weight: 500; }
-        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #667eea; }
-        textarea { min-height: 100px; resize: vertical; }
+        label { display: block; margin: 16px 0 8px; color: #444; font-weight: 500; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; background: #fafafa; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #667eea; background: white; }
+        textarea { min-height: 100px; resize: vertical; font-family: inherit; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
         
-        .btn { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: transform 0.2s; }
-        .btn:hover { transform: translateY(-2px); }
-        .btn-secondary { background: #6c757d; }
+        .btn { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
         
-        .file-upload { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin: 20px 0; cursor: pointer; transition: all 0.3s; }
+        .file-upload { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin: 20px 0; cursor: pointer; transition: all 0.3s; background: #fafafa; }
         .file-upload:hover { border-color: #667eea; background: #f8f9ff; }
         .file-upload.dragover { border-color: #667eea; background: #f8f9ff; }
         
-        #result { margin-top: 24px; padding: 20px; background: #f8f9fa; border-radius: 8px; display: none; }
-        #result h3 { color: #333; margin-bottom: 12px; }
-        #resultContent { white-space: pre-wrap; line-height: 1.6; color: #555; max-height: 400px; overflow-y: auto; }
-        .copy-btn { background: #28a745; margin-top: 12px; }
+        #result { margin-top: 24px; padding: 24px; background: #f8f9fa; border-radius: 12px; display: none; border-left: 4px solid #667eea; }
+        #result h3 { color: #333; margin-bottom: 16px; font-size: 18px; }
+        #resultContent { white-space: pre-wrap; line-height: 1.8; color: #444; max-height: 500px; overflow-y: auto; font-size: 14px; }
+        .copy-btn { background: #28a745; margin-top: 12px; margin-right: 12px; }
+        .download-btn { background: #007bff; margin-top: 12px; }
         
-        .tip { background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 16px; font-size: 13px; color: #856404; }
+        .tip { background: #fff3cd; padding: 14px 18px; border-radius: 8px; margin-top: 16px; font-size: 13px; color: #856404; border-left: 3px solid #ffc107; }
+        .success-tip { background: #d4edda; color: #155724; border-left-color: #28a745; }
+        
+        .footer { text-align: center; margin-top: 32px; color: rgba(255,255,255,0.7); font-size: 14px; }
+        .footer a { color: white; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🦐 虾条文档工具箱</h1>
-        <p class="subtitle">选择工具 → 填写要点 → 自动生成文档</p>
+        <p class="subtitle">选择工具 → 填写要点 → 自动生成专业文档</p>
         
         <div class="tool-grid">
             <div class="tool-card" onclick="showPanel('weekly')">
                 <div class="tool-icon">📊</div>
                 <div class="tool-name">周报生成器</div>
-                <div class="tool-desc">每周工作要点 → 完整周报</div>
+                <div class="tool-desc">每周工作要点 → 结构化周报，支持一键复制</div>
             </div>
             <div class="tool-card" onclick="showPanel('meeting')">
                 <div class="tool-icon">📝</div>
                 <div class="tool-name">会议纪要</div>
-                <div class="tool-desc">会议要点 → 结构化纪要</div>
+                <div class="tool-desc">会议信息 → 完整会议纪要，含待办跟踪</div>
             </div>
             <div class="tool-card" onclick="showPanel('proposal')">
                 <div class="tool-icon">💡</div>
                 <div class="tool-name">方案策划</div>
-                <div class="tool-desc">主题需求 → 完整方案</div>
+                <div class="tool-desc">主题需求 → 完整项目方案，含预算风险</div>
             </div>
             <div class="tool-card" onclick="showPanel('polish')">
                 <div class="tool-icon">✨</div>
                 <div class="tool-name">文档润色</div>
-                <div class="tool-desc">粗糙文案 → 专业文档</div>
+                <div class="tool-desc">粗糙文案 → 专业文档优化建议</div>
             </div>
             <div class="tool-card" onclick="showPanel('extract')">
                 <div class="tool-icon">📄</div>
                 <div class="tool-name">Word/PDF识别</div>
-                <div class="tool-desc">上传文档 → 提取文字</div>
+                <div class="tool-desc">上传文档 → 提取文字内容</div>
             </div>
             <div class="tool-card" onclick="showPanel('outline')">
                 <div class="tool-icon">📋</div>
                 <div class="tool-name">大纲生成</div>
-                <div class="tool-desc">主题 → 结构化大纲</div>
+                <div class="tool-desc">输入主题 → 自动生成文档结构大纲</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('daily')">
+                <div class="tool-icon">📅</div>
+                <div class="tool-name">日报助手</div>
+                <div class="tool-desc">每日工作 → 简洁日报生成</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('mind')">
+                <div class="tool-icon">🧠</div>
+                <div class="tool-name">思维导图</div>
+                <div class="tool-desc">主题 → 结构化思维导图大纲</div>
             </div>
         </div>
         
@@ -89,7 +108,7 @@
         <div class="panel" id="panel-weekly">
             <div class="panel-header">
                 <div class="panel-title">📊 周报生成器</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
             <div class="row">
                 <div>
@@ -101,27 +120,29 @@
                     <input type="text" id="weekDate" placeholder="例如：2026.03.03-03.09">
                 </div>
             </div>
-            <label>✅ 本周完成的工作</label>
-            <textarea id="weekCompleted" placeholder="1. 完成了xxx项目&#10;2. 整理了xxx文档&#10;3. ..."></textarea>
+            <label>✅ 本周完成的工作（必填）</label>
+            <textarea id="weekCompleted" placeholder="1. 完成了xxx项目&#10;2. 整理了xxx文档&#10;3. 参加了xxx会议..."></textarea>
             <label>🔄 正在进行的工作</label>
-            <textarea id="weekOngoing" placeholder="1. xxx项目进行中..."></textarea>
+            <textarea id="weekOngoing" placeholder="1. xxx项目进行中，预计本周完成..."></textarea>
             <label>📋 待办事项</label>
-            <textarea id="weekTodos" placeholder="1. 完成xxx&#10;2. 跟进xxx..."></textarea>
+            <textarea id="weekTodos" placeholder="1. 完成xxx（周三前）&#10;2. 跟进xxx..."></textarea>
             <label>💡 总结与反思</label>
             <textarea id="weekSummary" placeholder="本周收获、问题、改进建议..."></textarea>
-            <button class="btn" onclick="generateWeekly()">✨ 生成周报</button>
+            <div class="btn-group">
+                <button class="btn" onclick="generateWeekly()">✨ 生成周报</button>
+            </div>
         </div>
         
         <!-- 会议纪要 -->
         <div class="panel" id="panel-meeting">
             <div class="panel-header">
                 <div class="panel-title">📝 会议纪要生成器</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
             <div class="row">
                 <div>
-                    <label>🏷️ 会议主题</label>
-                    <input type="text" id="meetingTitle" placeholder="例如：月度经营分析会">
+                    <label>🏷️ 会议主题（必填）</label>
+                    <input type="text" id="meetingTitle" placeholder="例如：Q1经营分析会">
                 </div>
                 <div>
                     <label>👥 参会人员</label>
@@ -135,17 +156,17 @@
                 </div>
                 <div>
                     <label>📍 地点</label>
-                    <input type="text" id="meetingLocation" placeholder="会议室A">
+                    <input type="text" id="meetingLocation" placeholder="会议室A / 线上">
                 </div>
             </div>
-            <label>📌 会议议题</label>
-            <textarea id="meetingAgenda" placeholder="1. 上月工作总结&#10;2. 问题讨论..."></textarea>
-            <label>💬 讨论要点</label>
-            <textarea id="meetingDiscussion" placeholder="各环节讨论的核心观点..."></textarea>
+            <label>📌 会议议题（必填）</label>
+            <textarea id="meetingAgenda" placeholder="1. 上月工作总结&#10;2. 本月计划讨论..."></textarea>
+            <label>💬 讨论要点（必填）</label>
+            <textarea id="meetingDiscussion" placeholder="各环节讨论的核心观点和结论..."></textarea>
             <label>✅ 决议事项</label>
-            <textarea id="meetingDecision" placeholder="1. 确认xxx&#10;2. 推进xxx..."></textarea>
+            <textarea id="meetingDecision" placeholder="1. 确认xxx事项&#10;2. 通过xxx方案..."></textarea>
             <label>📋 待办任务</label>
-            <textarea id="meetingTasks" placeholder="任务1 - 负责人 - 完成时间&#10;任务2 - 负责人 - 完成时间"></textarea>
+            <textarea id="meetingTasks" placeholder="任务 - 负责人 - 完成时间"></textarea>
             <button class="btn" onclick="generateMeeting()">✨ 生成会议纪要</button>
         </div>
         
@@ -153,11 +174,11 @@
         <div class="panel" id="panel-proposal">
             <div class="panel-header">
                 <div class="panel-title">💡 方案策划助手</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
             <div class="row">
                 <div>
-                    <label>📌 方案名称</label>
+                    <label>📌 方案名称（必填）</label>
                     <input type="text" id="proposalName" placeholder="例如：Q2营销活动方案">
                 </div>
                 <div>
@@ -165,11 +186,11 @@
                     <input type="text" id="proposalDept" placeholder="市场部">
                 </div>
             </div>
-            <label>🎯 方案目标</label>
+            <label>🎯 方案目标（必填）</label>
             <textarea id="proposalGoal" placeholder="通过xxx达到xxx效果"></textarea>
-            <label>📊 背景分析</label>
-            <textarea id="proposalBackground" placeholder="现状、问题、机会点..."></textarea>
-            <label>💪 核心策略</label>
+            <label>📊 背景分析（必填）</label>
+            <textarea id="proposalBackground" placeholder="现状、问题、机会点分析..."></textarea>
+            <label>💪 核心策略（必填）</label>
             <textarea id="proposalStrategy" placeholder="主要打法、差异化优势..."></textarea>
             <label>📅 实施计划</label>
             <textarea id="proposalPlan" placeholder="阶段划分、时间节点..."></textarea>
@@ -186,9 +207,9 @@
         <div class="panel" id="panel-polish">
             <div class="panel-header">
                 <div class="panel-title">✨ 文档润色</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
-            <label>📄 需要润色的文案</label>
+            <label>📄 需要润色的文案（必填）</label>
             <textarea id="polishOriginal" placeholder="粘贴需要润色的文案..." style="min-height: 200px;"></textarea>
             <label>🎯 文档类型</label>
             <select id="polishType">
@@ -198,37 +219,36 @@
                 <option value="report">工作报告</option>
                 <option value="proposal">项目提案</option>
             </select>
-            <label>✏️ 润色要求（可选）</label>
-            <textarea id="polishRequest" placeholder="例如：更简洁、更有说服力、正式一点..."></textarea>
-            <button class="btn" onclick="polishDoc()">✨ 润色文档</button>
-            <div class="tip">💡 提示：这是本地演示版，直接输出优化后的文案。接入AI后可智能润色！</div>
+            <label>✏️ 润色要求</label>
+            <textarea id="polishRequest" placeholder="更简洁/更有说服力/正式一点..."></textarea>
+            <button class="btn" onclick="polishDoc()">✨ 生成润色建议</button>
         </div>
         
         <!-- Word/PDF识别 -->
         <div class="panel" id="panel-extract">
             <div class="panel-header">
                 <div class="panel-title">📄 Word/PDF 文字识别</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
             <div class="file-upload" id="fileUpload" onclick="document.getElementById('fileInput').click()">
-                <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
-                <div style="font-size: 18px; color: #333; margin-bottom: 8px;">点击或拖拽文件到此处</div>
+                <div style="font-size: 56px; margin-bottom: 16px;">📁</div>
+                <div style="font-size: 20px; color: #333; margin-bottom: 8px;">点击或拖拽文件到此处</div>
                 <div style="color: #666;">支持 .doc, .docx, .pdf 文件</div>
             </div>
             <input type="file" id="fileInput" style="display: none;" accept=".doc,.docx,.pdf" onchange="handleFileSelect(event)">
             <div id="fileInfo" style="display: none; padding: 16px; background: #e7f3ff; border-radius: 8px; margin-top: 16px;">
-                <strong>已选择：</strong><span id="fileName"></span>
+                <strong>✅ 已选择：</strong><span id="fileName"></span>
             </div>
-            <div class="tip">💡 提示：这是前端演示界面，接入后端后可自动提取文字并整理！</div>
+            <div class="tip">💡 提示：将文件发给虾条（我），可以帮你提取文字！</div>
         </div>
         
         <!-- 大纲生成 -->
         <div class="panel" id="panel-outline">
             <div class="panel-header">
                 <div class="panel-title">📋 大纲生成器</div>
-                <button class="close-btn" onclick="closePanel()">关闭</button>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
             </div>
-            <label>📌 文档主题</label>
+            <label>📌 文档主题（必填）</label>
             <input type="text" id="outlineTopic" placeholder="例如：2026年度工作计划">
             <label>📝 文档类型</label>
             <select id="outlineType">
@@ -240,25 +260,77 @@
             </select>
             <label>📏 详细程度</label>
             <select id="outlineLevel">
-                <option value="simple">简洁版（3-5个要点）</option>
-                <option value="normal">标准版（8-10个要点）</option>
-                <option value="detailed">详细版（15个以上要点）</option>
+                <option value="simple">简洁版</option>
+                <option value="normal">标准版</option>
+                <option value="detailed">详细版</option>
             </select>
-            <label>💡 特殊要求（可选）</label>
+            <label>💡 特殊要求</label>
             <textarea id="outlineRequest" placeholder="希望包含xxx部分、侧重xxx方面..."></textarea>
             <button class="btn" onclick="generateOutline()">✨ 生成大纲</button>
+        </div>
+        
+        <!-- 日报助手 -->
+        <div class="panel" id="panel-daily">
+            <div class="panel-header">
+                <div class="panel-title">📅 日报助手</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <div class="row">
+                <div>
+                    <label>📅 日期</label>
+                    <input type="text" id="dailyDate" placeholder="2026.03.11">
+                </div>
+                <div>
+                    <label>👤 姓名</label>
+                    <input type="text" id="dailyName" placeholder="张三">
+                </div>
+            </div>
+            <label>✅ 今日完成（必填）</label>
+            <textarea id="dailyCompleted" placeholder="1. 完成xxx&#10;2. 整理xxx..."></textarea>
+            <label>🔄 今日进行中</label>
+            <textarea id="dailyOngoing" placeholder="xxx项目进行中..."></textarea>
+            <label>📋 明日计划</label>
+            <textarea id="dailyPlan" placeholder="1. 开始xxx&#10;2. 完成xxx..."></textarea>
+            <label>💡 备注</label>
+            <textarea id="dailyNote" placeholder="问题、想法、建议..."></textarea>
+            <button class="btn" onclick="generateDaily()">✨ 生成日报</button>
+        </div>
+        
+        <!-- 思维导图 -->
+        <div class="panel" id="panel-mind">
+            <div class="panel-header">
+                <div class="panel-title">🧠 思维导图生成器</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <label>🎯 主题（必填）</label>
+            <input type="text" id="mindTopic" placeholder="例如：新产品发布方案">
+            <label>📝 核心要点（每行一个）</label>
+            <textarea id="mindPoints" placeholder="市场分析&#10;产品功能&#10;推广策略&#10;时间安排"></textarea>
+            <label>📏 展开层级</label>
+            <select id="mindLevel">
+                <option value="2">2层</option>
+                <option value="3">3层</option>
+                <option value="4">4层</option>
+            </select>
+            <button class="btn" onclick="generateMind()">✨ 生成思维导图</button>
         </div>
         
         <!-- 结果显示 -->
         <div id="result">
             <h3>📝 生成结果</h3>
             <div id="resultContent"></div>
-            <button class="btn copy-btn" onclick="copyResult()">📋 复制结果</button>
+            <div class="btn-group">
+                <button class="btn copy-btn" onclick="copyResult()">📋 复制结果</button>
+                <button class="btn download-btn" onclick="downloadResult()">💾 下载</button>
+            </div>
         </div>
+        
+        <div class="footer">🦐 虾条文档工具箱 · 让办公更高效</div>
     </div>
 
     <script>
         let currentResult = '';
+        let currentTitle = '';
         
         function showPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -273,8 +345,9 @@
             document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
         }
         
-        function showResult(text) {
+        function showResult(text, title = '文档') {
             currentResult = text;
+            currentTitle = title;
             document.getElementById('resultContent').textContent = text;
             document.getElementById('result').style.display = 'block';
             document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
@@ -286,156 +359,89 @@
             });
         }
         
-        // 周报生成
+        function downloadResult() {
+            const blob = new Blob([currentResult], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (currentTitle || '文档') + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
         function generateWeekly() {
             const week = document.getElementById('week').value || '第12周';
             const date = document.getElementById('weekDate').value || '2026.03.03-03.09';
-            const completed = document.getElementById('weekCompleted').value || '无';
-            const ongoing = document.getElementById('weekOngoing').value || '无';
-            const todos = document.getElementById('weekTodos').value || '无';
-            const summary = document.getElementById('weekSummary').value || '无';
+            const completed = document.getElementById('weekCompleted').value;
+            if (!completed) { alert('请填写本周完成的工作'); return; }
             
-            const report = `# ${week} 工作周报
-
-## 📅 时间范围
-${date}
-
----
-
-## ✅ 本周完成的工作
-${completed}
-
----
-
-## 🔄 正在进行的工作
-${ongoing}
-
----
-
-## 📋 待办事项
-${todos}
-
----
-
-## 💡 总结与反思
-${summary}
-
----
-
-* Generated by 🦐 虾条文档工具箱 *`;
-            showResult(report);
+            const ongoing = document.getElementById('weekOngoing').value;
+            const todos = document.getElementById('weekTodos').value;
+            const summary = document.getElementById('weekSummary').value;
+            
+            let report = `# ${week} 工作周报\n\n> 📅 ${date}\n\n---\n\n## ✅ 本周完成的工作\n${completed}`;
+            
+            if (ongoing) report += `\n\n---\n\n## 🔄 正在进行的工作\n${ongoing}`;
+            if (todos) report += `\n\n---\n\n## 📋 待办事项\n${todos}`;
+            if (summary) report += `\n\n---\n\n## 💡 总结与反思\n${summary}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, week + '周报');
         }
         
-        // 会议纪要生成
         function generateMeeting() {
-            const title = document.getElementById('meetingTitle').value || '会议';
-            const attendees = document.getElementById('meetingAttendees').value || '全体';
-            const time = document.getElementById('meetingTime').value || '';
-            const location = document.getElementById('meetingLocation').value || '';
-            const agenda = document.getElementById('meetingAgenda').value || '无';
-            const discussion = document.getElementById('meetingDiscussion').value || '无';
-            const decision = document.getElementById('meetingDecision').value || '无';
-            const tasks = document.getElementById('meetingTasks').value || '无';
+            const title = document.getElementById('meetingTitle').value;
+            const attendees = document.getElementById('meetingAttendees').value;
+            const time = document.getElementById('meetingTime').value;
+            const location = document.getElementById('meetingLocation').value;
+            const agenda = document.getElementById('meetingAgenda').value;
+            const discussion = document.getElementById('meetingDiscussion').value;
             
-            const report = `# ${title}
-
-## 📌 基本信息
-- **时间：** ${time}
-- **地点：** ${location}
-- **参会人员：** ${attendees}
-
----
-
-## 📌 会议议题
-${agenda}
-
----
-
-## 💬 讨论要点
-${discussion}
-
----
-
-## ✅ 决议事项
-${decision}
-
----
-
-## 📋 待办任务
-${tasks}
-
----
-
-* Generated by 🦐 虾条文档工具箱 *`;
-            showResult(report);
+            if (!title || !agenda || !discussion) { alert('请填写会议主题、议题和讨论要点'); return; }
+            
+            const decision = document.getElementById('meetingDecision').value;
+            const tasks = document.getElementById('meetingTasks').value;
+            
+            let report = `# ${title}\n\n---\n\n### 📌 基本信息\n\n| 项目 | 内容 |\n|------|------|\n| 时间 | ${time || '待定'} |\n| 地点 | ${location || '待定'} |\n| 参会 | ${attendees || '全体'} |\n\n---\n\n### 📌 会议议题\n\n${agenda}\n\n---\n\n### 💬 讨论要点\n\n${discussion}`;
+            
+            if (decision) report += `\n\n---\n\n### ✅ 决议事项\n\n${decision}`;
+            if (tasks) report += `\n\n---\n\n### 📋 待办任务\n\n${tasks}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, title + '会议纪要');
         }
         
-        // 方案生成
         function generateProposal() {
-            const name = document.getElementById('proposalName').value || '方案';
-            const dept = document.getElementById('proposalDept').value || '';
-            const goal = document.getElementById('proposalGoal').value || '无';
-            const background = document.getElementById('proposalBackground').value || '无';
-            const strategy = document.getElementById('proposalStrategy').value || '无';
-            const plan = document.getElementById('proposalPlan').value || '无';
-            const budget = document.getElementById('proposalBudget').value || '无';
-            const effect = document.getElementById('proposalEffect').value || '无';
-            const risk = document.getElementById('proposalRisk').value || '无';
+            const name = document.getElementById('proposalName').value;
+            const dept = document.getElementById('proposalDept').value;
+            const goal = document.getElementById('proposalGoal').value;
+            const background = document.getElementById('proposalBackground').value;
+            const strategy = document.getElementById('proposalStrategy').value;
             
-            const report = `# ${name}
-> 部门：${dept}
-
----
-
-## 🎯 一、方案目标
-${goal}
-
----
-
-## 📊 二、背景分析
-${background}
-
----
-
-## 💪 三、核心策略
-${strategy}
-
----
-
-## 📅 四、实施计划
-${plan}
-
----
-
-## 💰 五、预算资源
-${budget}
-
----
-
-## 📈 六、预期效果
-${effect}
-
----
-
-## ⚠️ 七、风险预案
-${risk}
-
----
-
-* Generated by 🦐 虾条文档工具箱 *`;
-            showResult(report);
+            if (!name || !goal || !background || !strategy) { alert('请填写方案名称、目标、背景和策略'); return; }
+            
+            const plan = document.getElementById('proposalPlan').value;
+            const budget = document.getElementById('proposalBudget').value;
+            const effect = document.getElementById('proposalEffect').value;
+            const risk = document.getElementById('proposalRisk').value;
+            
+            let report = `# ${name}\n\n> 🏢 ${dept || '项目组'}\n\n---\n\n## 🎯 一、方案目标\n\n${goal}\n\n---\n\n## 📊 二、背景分析\n\n${background}\n\n---\n\n## 💪 三、核心策略\n\n${strategy}`;
+            
+            if (plan) report += `\n\n---\n\n## 📅 四、实施计划\n\n${plan}`;
+            if (budget) report += `\n\n---\n\n## 💰 五、预算资源\n\n${budget}`;
+            if (effect) report += `\n\n---\n\n## 📈 六、预期效果\n\n${effect}`;
+            if (risk) report += `\n\n---\n\n## ⚠️ 七、风险预案\n\n${risk}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, name);
         }
         
-        // 文档润色
         function polishDoc() {
             const original = document.getElementById('polishOriginal').value;
+            if (!original) { alert('请输入需要润色的文案'); return; }
+            
             const type = document.getElementById('polishType').value;
             const request = document.getElementById('polishRequest').value;
-            
-            if (!original) {
-                alert('请输入需要润色的文案');
-                return;
-            }
             
             const typeMap = {
                 'formal': '正式公文风格',
@@ -445,33 +451,10 @@ ${risk}
                 'proposal': '项目提案风格'
             };
             
-            const result = `# ✨ 文档润色结果
-
-## 原文
-${original}
-
----
-
-## 润色建议（${typeMap[type]}）
-${request ? '要求：' + request : ''}
-
-> 💡 提示：接入AI后可直接生成润色后的完整文案。当前显示为模板参考。
-
----
-
-## 优化方向参考
-1. 结构优化：调整段落层次，使逻辑更清晰
-2. 语言精炼：删除冗余表述，用更简洁的表达
-3. 专业用语：使用更专业的行业术语
-4. 格式统一：确保标题、标点、术语统一
-
----
-
-* Generated by 🦐 虾条文档工具箱 *`;
-            showResult(result);
+            let report = `# ✨ 文档润色建议\n\n## 原文\n\n${original}\n\n---\n\n## 润色方向\n\n类型：${typeMap[type]}${request ? '，要求：' + request : ''}\n\n### 1️⃣ 结构优化\n- 调整段落层次，使逻辑更清晰\n- 开头点明主旨，结尾总结\n\n### 2️⃣ 语言精炼\n- 删除冗余表述\n- 使用更有力的动词\n\n### 3️⃣ 专业用语\n- 使用行业术语\n- 保持用语一致\n\n### 4️⃣ 格式规范\n- 标题格式统一\n- 标点符号规范\n\n---\n\n*Generated by 🦐 虾条文档工具箱*`;
+            showResult(report, '文档润色建议');
         }
         
-        // 文件选择处理
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
@@ -480,28 +463,10 @@ ${request ? '要求：' + request : ''}
             }
         }
         
-        // 拖拽上传
-        const fileUpload = document.getElementById('fileUpload');
-        fileUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUpload.classList.add('dragover');
-        });
-        fileUpload.addEventListener('dragleave', () => {
-            fileUpload.classList.remove('dragover');
-        });
-        fileUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fileUpload.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                document.getElementById('fileName').textContent = file.name;
-                document.getElementById('fileInfo').style.display = 'block';
-            }
-        });
-        
-        // 大纲生成
         function generateOutline() {
-            const topic = document.getElementById('outlineTopic').value || '文档';
+            const topic = document.getElementById('outlineTopic').value;
+            if (!topic) { alert('请输入文档主题'); return; }
+            
             const type = document.getElementById('outlineType').value;
             const level = document.getElementById('outlineLevel').value;
             const request = document.getElementById('outlineRequest').value;
@@ -514,62 +479,58 @@ ${request ? '要求：' + request : ''}
                 'intro': '产品介绍'
             };
             
-            const levelMap = {
-                'simple': '3-5',
-                'normal': '8-10',
-                'detailed': '15以上'
-            };
+            let report = `# ${topic}\n\n> 类型：${typeMap[type]} | 要求：${request || '标准'}\n\n---\n\n`;
             
-            const result = `# ${topic}
-
-> 类型：${typeMap[type]} | 详细程度：${levelMap[level]}个要点${request ? ' | 要求：' + request : ''}
-
----
-
-## 📌 文档结构大纲
-
-### 一、背景/前言
-- 项目背景介绍
-- 目的和意义
-
-### 二、现状分析
-- 现有情况描述
-- 问题与挑战
-- 机会点分析
-
-### 三、目标/愿景
-- 核心目标
-- 阶段性目标
-- 衡量指标
-
-### 四、策略/方案
-- 总体策略
-- 具体措施
-- 实施路径
-
-### 五、资源需求
-- 人力投入
-- 预算费用
-- 其他资源
-
-### 六、进度安排
-- 阶段划分
-- 时间节点
-- 里程碑
-
-### 七、效果预期
-- 预期成果
-- 量化收益
-- 风险预案
-
-### 八、总结
-- 核心要点
-- 下一步行动
-
----
-
-* Generated by 🦐 虾条文档工具箱 *`;
-            showResult(result);
+            const sections = ['概述', '现状分析', '目标设定', '策略方案', '资源需求', '进度安排', '效果预期', '总结'];
+            sections.forEach((s, i) => {
+                report += `### ${i+1}. ${s}\n\n`;
+                if (level !== 'simple') {
+                    report += '- 要点1\n- 要点2\n- 要点3\n\n';
+                }
+            });
+            
+            report += '---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, topic + '大纲');
+        }
+        
+        function generateDaily() {
+            const completed = document.getElementById('dailyCompleted').value;
+            if (!completed) { alert('请填写今日完成的工作'); return; }
+            
+            const date = document.getElementById('dailyDate').value || new Date().toLocaleDateString('zh-CN');
+            const name = document.getElementById('dailyName').value;
+            const ongoing = document.getElementById('dailyOngoing').value;
+            const plan = document.getElementById('dailyPlan').value;
+            const note = document.getElementById('dailyNote').value;
+            
+            let report = `# 工作日报\n\n> 📅 ${date} | 👤 ${name || '员工'}\n\n---\n\n## ✅ 今日完成\n${completed}`;
+            
+            if (ongoing) report += `\n\n---\n\n## 🔄 进行中\n${ongoing}`;
+            if (plan) report += `\n\n---\n\n## 📋 明日计划\n${plan}`;
+            if (note) report += `\n\n---\n\n## 💡 备注\n${note}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, date + '日报');
+        }
+        
+        function generateMind() {
+            const topic = document.getElementById('mindTopic').value;
+            const points = document.getElementById('mindPoints').value;
+            if (!topic || !points) { alert('请填写主题和核心要点'); return; }
+            
+            const level = document.getElementById('mindLevel').value;
+            const pointList = points.split('\n').filter(p => p.trim());
+            
+            let report = `# 🧠 ${topic}\n\n`;
+            pointList.forEach((p, i) => {
+                report += `\n### ${i+1}. ${p}\n\n`;
+                if (level > 2) {
+                    report += '- 子要点1\n- 子要点2\n';
+                }
+            });
+            
+            report += '\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, topic + '思维导图');
         }
     </script>
 </body>
