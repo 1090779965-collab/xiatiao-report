@@ -100,21 +100,20 @@
         .weather-temp { font-size: 48px; font-weight: bold; }
         .weather-city { font-size: 18px; margin: 8px 0; }
         .weather-desc { font-size: 16px; opacity: 0.9; }
-        .weather-input { margin-top: 16px; }
+        .weather-input { margin-top: 16px; display: flex; gap: 8px; }
         .weather-input input {
-            width: 70%;
+            flex: 1;
             padding: 10px;
             border: none;
-            border-radius: 8px 0 0 8px;
+            border-radius: 8px;
             font-size: 14px;
         }
         .weather-input button {
-            width: 28%;
-            padding: 10px;
+            padding: 10px 16px;
             border: none;
             background: #ff6b6b;
             color: white;
-            border-radius: 0 8px 8px 0;
+            border-radius: 8px;
             font-size: 14px;
             cursor: pointer;
         }
@@ -126,9 +125,7 @@
             margin: 20px auto;
             position: relative;
         }
-        .progress-ring svg {
-            transform: rotate(-90deg);
-        }
+        .progress-ring svg { transform: rotate(-90deg); }
         .progress-ring circle {
             fill: none;
             stroke-width: 12;
@@ -180,11 +177,7 @@
         }
         
         /* 待办 */
-        .todo-input {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
+        .todo-input { display: flex; gap: 8px; margin-bottom: 16px; }
         .todo-input input {
             flex: 1;
             padding: 12px;
@@ -209,10 +202,7 @@
             align-items: center;
             gap: 12px;
         }
-        .todo-item.done .text {
-            text-decoration: line-through;
-            color: #999;
-        }
+        .todo-item.done .text { text-decoration: line-through; color: #999; }
         .todo-checkbox {
             width: 20px;
             height: 20px;
@@ -220,17 +210,10 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        .todo-item.done .todo-checkbox {
-            background: #ff6b6b;
-        }
+        .todo-item.done .todo-checkbox { background: #ff6b6b; }
         
         /* 白板 */
-        .canvas-tools {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
+        .canvas-tools { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         .color-btn {
             width: 32px;
             height: 32px;
@@ -239,18 +222,9 @@
             cursor: pointer;
         }
         .color-btn.active { border-color: #333; }
-        .canvas-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            touch-action: none;
-        }
-        #canvas { width: 100%; height: 60vh; display: block; }
-        .canvas-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
+        .canvas-container { background: white; border-radius: 12px; overflow: hidden; touch-action: none; }
+        #canvas { width: 100%; height: 50vh; display: block; }
+        .canvas-actions { display: flex; gap: 8px; margin-top: 12px; }
         .canvas-actions button {
             flex: 1;
             padding: 12px;
@@ -261,6 +235,29 @@
         }
         .clear-btn { background: #ff6b6b; color: white; }
         .save-btn { background: #4cd137; color: white; }
+        
+        /* 情绪日记 */
+        .mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+        .mood-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 4px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+        .mood-btn:hover { transform: scale(1.05); }
+        .mood-btn.selected { border-color: #667eea; background: #f0f4ff; }
+        .mood-btn .emoji { font-size: 24px; }
+        .mood-btn .label { font-size: 10px; color: #666; margin-top: 2px; }
+        .history-title { color: #333; font-size: 16px; margin: 16px 0 8px; }
+        .history-item { background: white; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+        .history-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .history-emoji { font-size: 20px; }
+        .history-date { font-size: 10px; color: #999; }
+        .history-text { color: #333; font-size: 12px; }
         
         /* 底部导航 */
         .tab-bar {
@@ -273,13 +270,7 @@
             padding: 8px 0;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
-        .tab-item {
-            flex: 1;
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            cursor: pointer;
-        }
+        .tab-item { flex: 1; text-align: center; font-size: 12px; color: #999; cursor: pointer; }
         .tab-item.active { color: #ff6b6b; }
         .tab-item .icon { font-size: 24px; display: block; margin-bottom: 2px; }
     </style>
@@ -289,28 +280,25 @@
     
     <div class="grid page active" id="home">
         <div class="tool-card" onclick="showPage('random')">
-            <div class="icon">🎲</div>
-            <div class="name">随机挑一个</div>
+            <div class="icon">🎲</div><div class="name">随机挑一个</div>
         </div>
         <div class="tool-card" onclick="showPage('weather')">
-            <div class="icon">🌤️</div>
-            <div class="name">今日天气</div>
+            <div class="icon">🌤️</div><div class="name">今日天气</div>
         </div>
         <div class="tool-card" onclick="showPage('progress')">
-            <div class="icon">⏰</div>
-            <div class="name">时间进度</div>
+            <div class="icon">⏰</div><div class="name">时间进度</div>
         </div>
         <div class="tool-card" onclick="showPage('anniv')">
-            <div class="icon">📅</div>
-            <div class="name">纪念日</div>
+            <div class="icon">📅</div><div class="name">纪念日</div>
         </div>
         <div class="tool-card" onclick="showPage('todo')">
-            <div class="icon">📝</div>
-            <div class="name">待办事项</div>
+            <div class="icon">📝</div><div class="name">待办事项</div>
         </div>
         <div class="tool-card" onclick="showPage('whiteboard')">
-            <div class="icon">🎨</div>
-            <div class="name">白板</div>
+            <div class="icon">🎨</div><div class="name">白板</div>
+        </div>
+        <div class="tool-card" onclick="showPage('mood')">
+            <div class="icon">💭</div><div class="name">情绪日记</div>
         </div>
     </div>
     
@@ -325,7 +313,7 @@
     <!-- 天气 -->
     <div class="page" id="weather">
         <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="weather-card" id="weatherCard">
+        <div class="weather-card">
             <div class="weather-temp" id="temp">--°</div>
             <div class="weather-city" id="city">请输入城市</div>
             <div class="weather-desc" id="desc">点击查询</div>
@@ -342,17 +330,14 @@
         <div class="progress-ring">
             <svg width="200" height="200">
                 <circle class="bg" cx="100" cy="100" r="88"></circle>
-                <circle class="fg" id="progressCircle" cx="100" cy="100" r="88" 
-                    stroke-dasharray="553" stroke-dashoffset="553"></circle>
+                <circle class="fg" id="progressCircle" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="553"></circle>
             </svg>
             <div class="progress-text">
                 <div class="progress-percent" id="percent">0%</div>
                 <div class="progress-time" id="timeText">00:00:00</div>
             </div>
         </div>
-        <div style="text-align:center;color:#666;">
-            今年的进度：<span id="yearProgress">0%</span>
-        </div>
+        <div style="text-align:center;color:#666;">今年的进度：<span id="yearProgress">0%</span></div>
     </div>
     
     <!-- 纪念日 -->
@@ -387,14 +372,32 @@
         </div>
         <div class="canvas-actions">
             <button class="clear-btn" onclick="clearCanvas()">清空</button>
-            <button class="save-btn" onclick="saveCanvas()">保存图片</button>
+            <button class="save-btn" onclick="saveCanvas()">保存</button>
         </div>
+    </div>
+    
+    <!-- 情绪日记 -->
+    <div class="page" id="mood">
+        <button class="btn-back" onclick="showPage('home')">← 返回</button>
+        <div class="mood-grid" id="moodGrid">
+            <div class="mood-btn" data-mood="开心" data-emoji="😄" onclick="selectMood(this)"><span class="emoji">😄</span><span class="label">开心</span></div>
+            <div class="mood-btn" data-mood="平静" data-emoji="😌" onclick="selectMood(this)"><span class="emoji">😌</span><span class="label">平静</span></div>
+            <div class="mood-btn" data-mood="难过" data-emoji="😢" onclick="selectMood(this)"><span class="emoji">😢</span><span class="label">难过</span></div>
+            <div class="mood-btn" data-mood="焦虑" data-emoji="😰" onclick="selectMood(this)"><span class="emoji">😰</span><span class="label">焦虑</span></div>
+            <div class="mood-btn" data-mood="生气" data-emoji="😤" onclick="selectMood(this)"><span class="emoji">😤</span><span class="label">生气</span></div>
+            <div class="mood-btn" data-mood="疲惫" data-emoji="😴" onclick="selectMood(this)"><span class="emoji">😴</span><span class="label">疲惫</span></div>
+            <div class="mood-btn" data-mood="兴奋" data-emoji="🤩" onclick="selectMood(this)"><span class="emoji">🤩</span><span class="label">兴奋</span></div>
+            <div class="mood-btn" data-mood="感动" data-emoji="🥰" onclick="selectMood(this)"><span class="emoji">🥰</span><span class="label">感动</span></div>
+        </div>
+        <textarea class="random-input" id="moodNote" placeholder="今天发生了什么？写下你的感受..."></textarea>
+        <button class="random-btn" onclick="saveMood()">保存记录</button>
+        <div class="history-title">📅 过往记录</div>
+        <div id="moodHistory"></div>
     </div>
     
     <div class="tab-bar">
         <div class="tab-item active" onclick="showPage('home')">
-            <span class="icon">🏠</span>
-            首页
+            <span class="icon">🏠</span>首页
         </div>
     </div>
 
@@ -405,8 +408,10 @@
             if (id === 'progress') updateProgress();
             if (id === 'anniv') renderAnniv();
             if (id === 'todo') renderTodo();
+            if (id === 'mood') renderMood();
         }
         
+        // 随机选择
         function doRandom() {
             const text = document.getElementById('randomItems').value.trim();
             if (!text) { alert('请输入选项'); return; }
@@ -418,6 +423,7 @@
             el.style.display = 'block';
         }
         
+        // 天气
         async function getWeather() {
             const city = document.getElementById('cityInput').value.trim();
             if (!city) { alert('请输入城市名'); return; }
@@ -428,129 +434,91 @@
                     document.getElementById('temp').textContent = data.data.temp + '°';
                     document.getElementById('city').textContent = data.data.city;
                     document.getElementById('desc').textContent = data.data.type + ' ' + data.data.lowest + '~' + data.data.highest;
-                } else {
-                    alert('未找到该城市');
-                }
-            } catch (e) {
-                alert('查询失败');
-            }
+                } else { alert('未找到该城市'); }
+            } catch (e) { alert('查询失败'); }
         }
         
+        // 时间进度
         function updateProgress() {
             const now = new Date();
             const start = new Date(now.getFullYear(), 0, 0);
             const diff = now - start;
-            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const day = Math.floor(diff / (1000*60*60*24));
             const percent = (day / 365 * 100).toFixed(1);
-            
             document.getElementById('percent').textContent = percent + '%';
             document.getElementById('yearProgress').textContent = percent + '%';
-            
-            const offset = 553 * (1 - day / 365);
-            document.getElementById('progressCircle').style.strokeDashoffset = offset;
-            
-            document.getElementById('timeText').textContent = 
-                now.getHours().toString().padStart(2,'0') + ':' + 
-                now.getMinutes().toString().padStart(2,'0') + ':' + 
-                now.getSeconds().toString().padStart(2,'0');
+            document.getElementById('progressCircle').style.strokeDashoffset = 553 * (1 - day/365);
+            document.getElementById('timeText').textContent = now.toTimeString().slice(0,8);
         }
         
+        // 纪念日
         let annivs = JSON.parse(localStorage.getItem('annivs') || '[]');
         function renderAnniv() {
-            const list = document.getElementById('annivList');
-            list.innerHTML = annivs.map((j, i) => {
+            document.getElementById('annivList').innerHTML = annivs.map(j => {
                 const days = Math.floor((new Date() - new Date(j.date)) / (1000*60*60*24));
-                return '<div class="anniv-item"><div><div style="font-weight:bold">' + j.name + '</div><div style="font-size:12px;color:#666">' + j.date + '</div></div><div class="anniv-days">' + days + '天</div></div>';
+                return '<div class="anniv-item"><div><div style="font-weight:bold">'+j.name+'</div><div style="font-size:12px;color:#666">'+j.date+'</div></div><div class="anniv-days">'+days+'天</div></div>';
             }).join('');
         }
         function addAnniv() {
             const name = prompt('名称：');
             const date = prompt('日期(YYYY-MM-DD)：');
-            if (name && date) {
-                annivs.push({name, date});
-                localStorage.setItem('annivs', JSON.stringify(annivs));
-                renderAnniv();
-            }
+            if (name && date) { annivs.push({name, date}); localStorage.setItem('annivs', JSON.stringify(annivs)); renderAnniv(); }
         }
         
+        // 待办
         let todos = JSON.parse(localStorage.getItem('todos') || '[]');
         function renderTodo() {
             document.getElementById('todoList').innerHTML = todos.map((t, i) => 
-                '<div class="todo-item ' + (t.done?'done':'') + '"><div class="todo-checkbox" onclick="toggleTodo(' + i + ')"></div><span class="text">' + t.text + '</span></div>'
+                '<div class="todo-item '+(t.done?'done':'')+'"><div class="todo-checkbox" onclick="toggleTodo('+i+')"></div><span class="text">'+t.text+'</span></div>'
             ).join('');
         }
         function addTodo() {
             const text = document.getElementById('todoInput').value.trim();
-            if (text) {
-                todos.push({text, done: false});
-                localStorage.setItem('todos', JSON.stringify(todos));
-                document.getElementById('todoInput').value = '';
-                renderTodo();
-            }
+            if (text) { todos.push({text, done: false}); localStorage.setItem('todos', JSON.stringify(todos)); document.getElementById('todoInput').value=''; renderTodo(); }
         }
-        function toggleTodo(i) {
-            todos[i].done = !todos[i].done;
-            localStorage.setItem('todos', JSON.stringify(todos));
-            renderTodo();
-        }
+        function toggleTodo(i) { todos[i].done = !todos[i].done; localStorage.setItem('todos', JSON.stringify(todos)); renderTodo(); }
         
+        // 白板
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false, color = '#000', lastX = 0, lastY = 0;
-        
-        function initCanvas() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
         canvas.addEventListener('mousedown', e => { drawing = true; [lastX,lastY] = [e.offsetX,e.offsetY]; });
-        canvas.addEventListener('mousemove', e => {
-            if (!drawing) return;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        });
+        canvas.addEventListener('mousemove', e => { if(!drawing)return; ctx.strokeStyle=color; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); [lastX,lastY]=[e.offsetX,e.offsetY]; });
         canvas.addEventListener('mouseup', () => drawing = false);
-        canvas.addEventListener('touchstart', e => {
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            drawing = true; [lastX,lastY] = [t.clientX-rect.left, t.clientY-rect.top];
-        });
-        canvas.addEventListener('touchmove', e => {
-            if (!drawing) return;
-            e.preventDefault();
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(t.clientX-rect.left, t.clientY-rect.top);
-            ctx.stroke();
-            [lastX, lastY] = [t.clientX-rect.left, t.clientY-rect.top];
-        });
+        canvas.addEventListener('touchstart', e => { const t=e.touches[0], r=canvas.getBoundingClientRect(); drawing=true; [lastX,lastY]=[t.clientX-r.left,t.clientY-r.top]; });
+        canvas.addEventListener('touchmove', e => { if(!drawing)return; e.preventDefault(); const t=e.touches[0], r=canvas.getBoundingClientRect(); ctx.strokeStyle=color; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(t.clientX-r.left,t.clientY-r.top); ctx.stroke(); [lastX,lastY]=[t.clientX-r.left,t.clientY-r.top]; });
         canvas.addEventListener('touchend', () => drawing = false);
-        
-        function setColor(c, btn) {
-            color = c;
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+        function setColor(c, btn) { color = c; document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
         function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        function saveCanvas() {
-            const link = document.createElement('a');
-            link.download = '虾条白板.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        }
+        function saveCanvas() { const link = document.createElement('a'); link.download = '虾条白板.png'; link.href = canvas.toDataURL(); link.click(); }
         
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        // 情绪日记
+        let selectedMood = null;
+        function selectMood(btn) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedMood = { name: btn.dataset.mood, emoji: btn.dataset.emoji };
+        }
+        function saveMood() {
+            const note = document.getElementById('moodNote').value.trim();
+            if (!selectedMood) { alert('请选择一个情绪~'); return; }
+            if (!note) { alert('请写下今天的心情~'); return; }
+            const entry = { mood: selectedMood.name, emoji: selectedMood.emoji, note: note, date: new Date().toLocaleString('zh-CN') };
+            const history = JSON.parse(localStorage.getItem('moodDiary') || '[]');
+            history.unshift(entry);
+            localStorage.setItem('moodDiary', JSON.stringify(history));
+            document.getElementById('moodNote').value = '';
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            selectedMood = null;
+            renderMood();
+            alert('保存成功！');
+        }
+        function renderMood() {
+            const history = JSON.parse(localStorage.getItem('moodDiary') || '[]');
+            document.getElementById('moodHistory').innerHTML = history.map(item => 
+                '<div class="history-item"><div class="history-header"><span class="history-emoji">'+item.emoji+'</span><span class="history-date">'+item.date+'</span></div><div class="history-text">'+item.note+'</div></div>'
+            ).join('') || '<div style="text-align:center;color:#999;padding:20px">还没有记录~</div>';
         }
     </script>
 </body>
