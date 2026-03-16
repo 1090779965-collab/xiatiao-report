@@ -2,573 +2,640 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>虾条工具箱</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff6b6b">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦐 虾条文档工具箱</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            padding-bottom: 70px;
-        }
-        .header {
-            background: linear-gradient(135deg, #ff6b6b, #ffa502);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 12px;
-        }
-        .tool-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .tool-card:active { transform: scale(0.98); }
-        .tool-card .icon { font-size: 32px; margin-bottom: 8px; }
-        .tool-card .name { font-size: 14px; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 8px; font-size: 32px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 24px; font-size: 16px; }
         
-        .page { display: none; padding: 16px; }
-        .page.active { display: block; }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: white; border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .tool-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .tool-card.active { border: 3px solid #667eea; }
+        .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); }
+        .tool-icon { font-size: 48px; margin-bottom: 12px; }
+        .tool-name { font-size: 20px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .tool-desc { font-size: 14px; color: #666; line-height: 1.5; }
         
-        .btn-back {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-bottom: 16px;
-        }
+        .panel { background: white; border-radius: 16px; padding: 32px; display: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .panel.active { display: block; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+        .panel-title { font-size: 24px; font-weight: 600; color: #333; }
+        .close-btn { background: #f0f0f0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .close-btn:hover { background: #e0e0e0; }
         
-        /* 随机选择 */
-        .random-input {
-            width: 100%;
-            height: 120px;
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 16px;
-            resize: none;
-            margin-bottom: 12px;
-        }
-        .random-btn {
-            width: 100%;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .random-result {
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #ff6b6b, #ffa502);
-            color: white;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            display: none;
-        }
+        label { display: block; margin: 16px 0 8px; color: #444; font-weight: 500; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; background: #fafafa; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #667eea; background: white; }
+        textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
         
-        /* 天气 */
-        .weather-card {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            color: white;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-        }
-        .weather-temp { font-size: 48px; font-weight: bold; }
-        .weather-city { font-size: 18px; margin: 8px 0; }
-        .weather-desc { font-size: 16px; opacity: 0.9; }
-        .weather-input { margin-top: 16px; }
-        .weather-input input {
-            width: 70%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px 0 0 8px;
-            font-size: 14px;
-        }
-        .weather-input button {
-            width: 28%;
-            padding: 10px;
-            border: none;
-            background: #ff6b6b;
-            color: white;
-            border-radius: 0 8px 8px 0;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .btn { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
         
-        /* 时间进度 */
-        .progress-ring {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            position: relative;
-        }
-        .progress-ring svg {
-            transform: rotate(-90deg);
-        }
-        .progress-ring circle {
-            fill: none;
-            stroke-width: 12;
-        }
-        .progress-ring .bg { stroke: #eee; }
-        .progress-ring .fg { 
-            stroke: #ff6b6b;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1s;
-        }
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-        .progress-percent { font-size: 36px; font-weight: bold; color: #ff6b6b; }
-        .progress-time { font-size: 14px; color: #666; margin-top: 4px; }
+        .file-upload { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin: 20px 0; cursor: pointer; transition: all 0.3s; background: #fafafa; }
+        .file-upload:hover { border-color: #667eea; background: #f8f9ff; }
+        .file-upload.dragover { border-color: #667eea; background: #f8f9ff; }
         
-        /* 纪念日 */
-        .纪念日-list { margin-top: 12px; }
-        .纪念日-item {
-            background: white;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .纪念日-days {
-            background: #ff6b6b;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .add-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 12px;
-        }
+        #result { margin-top: 24px; padding: 24px; background: #f8f9fa; border-radius: 12px; display: none; border-left: 4px solid #667eea; }
+        #result h3 { color: #333; margin-bottom: 16px; font-size: 18px; }
+        #resultContent { white-space: pre-wrap; line-height: 1.8; color: #444; max-height: 500px; overflow-y: auto; font-size: 14px; }
+        .copy-btn { background: #28a745; margin-top: 12px; margin-right: 12px; }
+        .download-btn { background: #007bff; margin-top: 12px; }
         
-        /* 待办 */
-        .todo-input {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .todo-input input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .todo-input button {
-            padding: 12px 20px;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .todo-item {
-            background: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .todo-item.done .text {
-            text-decoration: line-through;
-            color: #999;
-        }
-        .todo-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #ff6b6b;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .todo-item.done .todo-checkbox {
-            background: #ff6b6b;
-        }
+        .tip { background: #fff3cd; padding: 14px 18px; border-radius: 8px; margin-top: 16px; font-size: 13px; color: #856404; border-left: 3px solid #ffc107; }
+        .success-tip { background: #d4edda; color: #155724; border-left-color: #28a745; }
         
-        /* 白板 */
-        .canvas-tools {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-        .color-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
-        .color-btn.active { border-color: #333; }
-        .canvas-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            touch-action: none;
-        }
-        #canvas { width: 100%; height: 60vh; display: block; }
-        .canvas-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .canvas-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .clear-btn { background: #ff6b6b; color: white; }
-        .save-btn { background: #4cd137; color: white; }
-        
-        /* 底部导航 */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            padding: 8px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-        .tab-item {
-            flex: 1;
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            cursor: pointer;
-        }
-        .tab-item.active { color: #ff6b6b; }
-        .tab-item .icon { font-size: 24px; display: block; margin-bottom: 2px; }
+        .footer { text-align: center; margin-top: 32px; color: rgba(255,255,255,0.7); font-size: 14px; }
+        .footer a { color: white; }
     </style>
 </head>
 <body>
-    <div class="header">🦐 虾条工具箱</div>
-    
-    <div class="grid page active" id="home">
-        <div class="tool-card" onclick="showPage('random')">
-            <div class="icon">🎲</div>
-            <div class="name">随机挑一个</div>
-        </div>
-        <div class="tool-card" onclick="showPage('weather')">
-            <div class="icon">🌤️</div>
-            <div class="name">今日天气</div>
-        </div>
-        <div class="tool-card" onclick="showPage('progress')">
-            <div class="icon">⏰</div>
-            <div class="name">时间进度</div>
-        </div>
-        <div class="tool-card" onclick="showPage('纪念日')">
-            <div class="icon">📅</div>
-            <div class="name">纪念日</div>
-        </div>
-        <div class="tool-card" onclick="showPage('todo')">
-            <div class="icon">📝</div>
-            <div class="name">待办事项</div>
-        </div>
-        <div class="tool-card" onclick="showPage('whiteboard')">
-            <div class="icon">🎨</div>
-            <div class="name">白板</div>
-        </div>
-    </div>
-    
-    <!-- 随机选择 -->
-    <div class="page" id="random">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <textarea class="random-input" id="randomItems" placeholder="每行输入一个选项&#10;例如：&#10;苹果&#10;香蕉&#10;橙子"></textarea>
-        <button class="random-btn" onclick="doRandom()">开始随机选择</button>
-        <div class="random-result" id="randomResult"></div>
-    </div>
-    
-    <!-- 天气 -->
-    <div class="page" id="weather">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="weather-card" id="weatherCard">
-            <div class="weather-temp" id="temp">--°</div>
-            <div class="weather-city" id="city">请输入城市</div>
-            <div class="weather-desc" id="desc">点击查询</div>
-        </div>
-        <div class="weather-input">
-            <input type="text" id="cityInput" placeholder="输入城市名">
-            <button onclick="getWeather()">查询</button>
-        </div>
-    </div>
-    
-    <!-- 时间进度 -->
-    <div class="page" id="progress">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="progress-ring">
-            <svg width="200" height="200">
-                <circle class="bg" cx="100" cy="100" r="88"></circle>
-                <circle class="fg" id="progressCircle" cx="100" cy="100" r="88" 
-                    stroke-dasharray="553" stroke-dashoffset="553"></circle>
-            </svg>
-            <div class="progress-text">
-                <div class="progress-percent" id="percent">0%</div>
-                <div class="progress-time" id="timeText">00:00:00</div>
+    <div class="container">
+        <h1>🦐 虾条文档工具箱</h1>
+        <p class="subtitle">选择工具 → 填写要点 → 自动生成专业文档</p>
+        
+        <div class="tool-grid">
+            <div class="tool-card" onclick="showPanel('weekly')">
+                <div class="tool-icon">📊</div>
+                <div class="tool-name">周报生成器</div>
+                <div class="tool-desc">每周工作要点 → 结构化周报，支持一键复制</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('meeting')">
+                <div class="tool-icon">📝</div>
+                <div class="tool-name">会议纪要</div>
+                <div class="tool-desc">会议信息 → 完整会议纪要，含待办跟踪</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('proposal')">
+                <div class="tool-icon">💡</div>
+                <div class="tool-name">方案策划</div>
+                <div class="tool-desc">主题需求 → 完整项目方案，含预算风险</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('polish')">
+                <div class="tool-icon">✨</div>
+                <div class="tool-name">文档润色</div>
+                <div class="tool-desc">粗糙文案 → 专业文档优化建议</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('extract')">
+                <div class="tool-icon">📄</div>
+                <div class="tool-name">Word/PDF识别</div>
+                <div class="tool-desc">上传文档 → 提取文字内容</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('outline')">
+                <div class="tool-icon">📋</div>
+                <div class="tool-name">大纲生成</div>
+                <div class="tool-desc">输入主题 → 自动生成文档结构大纲</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('daily')">
+                <div class="tool-icon">📅</div>
+                <div class="tool-name">日报助手</div>
+                <div class="tool-desc">每日工作 → 简洁日报生成</div>
+            </div>
+            <div class="tool-card" onclick="showPanel('mind')">
+                <div class="tool-icon">🧠</div>
+                <div class="tool-name">思维导图</div>
+                <div class="tool-desc">主题 → 结构化思维导图大纲</div>
             </div>
         </div>
-        <div style="text-align:center;color:#666;">
-            今年的进度：<span id="yearProgress">0%</span>
+        
+        <!-- 周报生成器 -->
+        <div class="panel" id="panel-weekly">
+            <div class="panel-header">
+                <div class="panel-title">📊 周报生成器</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <div class="row">
+                <div>
+                    <label>📅 周次</label>
+                    <input type="text" id="week" placeholder="例如：第12周">
+                </div>
+                <div>
+                    <label>📅 日期范围</label>
+                    <input type="text" id="weekDate" placeholder="例如：2026.03.03-03.09">
+                </div>
+            </div>
+            <label>✅ 本周完成的工作（必填）</label>
+            <textarea id="weekCompleted" placeholder="1. 完成了xxx项目&#10;2. 整理了xxx文档&#10;3. 参加了xxx会议..."></textarea>
+            <label>🔄 正在进行的工作</label>
+            <textarea id="weekOngoing" placeholder="1. xxx项目进行中，预计本周完成..."></textarea>
+            <label>📋 待办事项</label>
+            <textarea id="weekTodos" placeholder="1. 完成xxx（周三前）&#10;2. 跟进xxx..."></textarea>
+            <label>💡 总结与反思</label>
+            <textarea id="weekSummary" placeholder="本周收获、问题、改进建议..."></textarea>
+            <div class="btn-group">
+                <button class="btn" onclick="generateWeekly()">✨ 生成周报</button>
+            </div>
         </div>
-    </div>
-    
-    <!-- 纪念日 -->
-    <div class="page" id="纪念日">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="纪念日-list" id="纪念日List"></div>
-        <button class="add-btn" onclick="add纪念日()">+ 添加纪念日</button>
-    </div>
-    
-    <!-- 待办 -->
-    <div class="page" id="todo">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="todo-input">
-            <input type="text" id="todoInput" placeholder="添加待办事项...">
-            <button onclick="addTodo()">添加</button>
+        
+        <!-- 会议纪要 -->
+        <div class="panel" id="panel-meeting">
+            <div class="panel-header">
+                <div class="panel-title">📝 会议纪要生成器</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <div class="row">
+                <div>
+                    <label>🏷️ 会议主题（必填）</label>
+                    <input type="text" id="meetingTitle" placeholder="例如：Q1经营分析会">
+                </div>
+                <div>
+                    <label>👥 参会人员</label>
+                    <input type="text" id="meetingAttendees" placeholder="张三、李四、王五">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label>📅 日期时间</label>
+                    <input type="text" id="meetingTime" placeholder="2026.03.11 14:00-16:00">
+                </div>
+                <div>
+                    <label>📍 地点</label>
+                    <input type="text" id="meetingLocation" placeholder="会议室A / 线上">
+                </div>
+            </div>
+            <label>📌 会议议题（必填）</label>
+            <textarea id="meetingAgenda" placeholder="1. 上月工作总结&#10;2. 本月计划讨论..."></textarea>
+            <label>💬 讨论要点（必填）</label>
+            <textarea id="meetingDiscussion" placeholder="各环节讨论的核心观点和结论..."></textarea>
+            <label>✅ 决议事项</label>
+            <textarea id="meetingDecision" placeholder="1. 确认xxx事项&#10;2. 通过xxx方案..."></textarea>
+            <label>📋 待办任务</label>
+            <textarea id="meetingTasks" placeholder="任务 - 负责人 - 完成时间"></textarea>
+            <button class="btn" onclick="generateMeeting()">✨ 生成会议纪要</button>
         </div>
-        <div id="todoList"></div>
-    </div>
-    
-    <!-- 白板 -->
-    <div class="page" id="whiteboard">
-        <button class="btn-back" onclick="showPage('home')">← 返回</button>
-        <div class="canvas-tools">
-            <div class="color-btn active" style="background:#000" onclick="setColor('#000',this)"></div>
-            <div class="color-btn" style="background:#ff6b6b" onclick="setColor('#ff6b6b',this)"></div>
-            <div class="color-btn" style="background:#4cd137" onclick="setColor('#4cd137',this)"></div>
-            <div class="color-btn" style="background:#0984e3" onclick="setColor('#0984e3',this)"></div>
-            <div class="color-btn" style="background:#ffa502" onclick="setColor('#ffa502',this)"></div>
+        
+        <!-- 方案策划 -->
+        <div class="panel" id="panel-proposal">
+            <div class="panel-header">
+                <div class="panel-title">💡 方案策划助手</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            
+            <!-- 参考资料上传 -->
+            <div style="background: #f0f7ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <label style="margin-top:0;">📎 参考资料（可选，上传Word/PDF自动提取内容）</label>
+                <input type="file" id="proposalFile" accept=".doc,.docx,.pdf" onchange="handleProposalFile(event)" style="margin-top:8px;">
+                <div id="proposalFileInfo" style="display:none; margin-top:12px; padding:12px; background:white; border-radius:6px; border-left:3px solid #667eea;">
+                    <strong>✅ 已上传：</strong><span id="proposalFileName"></span>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div>
+                    <label>📌 方案名称（必填）</label>
+                    <input type="text" id="proposalName" placeholder="例如：Q2营销活动方案">
+                </div>
+                <div>
+                    <label>🏢 部门/项目</label>
+                    <input type="text" id="proposalDept" placeholder="市场部">
+                </div>
+            </div>
+            <label>🎯 方案目标（必填）</label>
+            <textarea id="proposalGoal" placeholder="通过xxx达到xxx效果"></textarea>
+            <label>📊 背景分析（必填）</label>
+            <textarea id="proposalBackground" placeholder="现状、问题、机会点分析..."></textarea>
+            <label>💪 核心策略（必填）</label>
+            <textarea id="proposalStrategy" placeholder="主要打法、差异化优势..."></textarea>
+            <label>📅 实施计划</label>
+            <textarea id="proposalPlan" placeholder="阶段划分、时间节点..."></textarea>
+            <label>💰 预算资源</label>
+            <textarea id="proposalBudget" placeholder="预算金额、资源需求..."></textarea>
+            <label>📈 预期效果</label>
+            <textarea id="proposalEffect" placeholder="量化指标、达成效果..."></textarea>
+            <label>⚠️ 风险预案</label>
+            <textarea id="proposalRisk" placeholder="可能风险及应对措施..."></textarea>
+            <button class="btn" onclick="generateProposal()">✨ 生成方案</button>
         </div>
-        <div class="canvas-container">
-            <canvas id="canvas"></canvas>
+        
+        <!-- 文档润色 -->
+        <div class="panel" id="panel-polish">
+            <div class="panel-header">
+                <div class="panel-title">✨ 文档润色</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <label>📄 需要润色的文案（必填）</label>
+            <textarea id="polishOriginal" placeholder="粘贴需要润色的文案..." style="min-height: 200px;"></textarea>
+            <label>🎯 文档类型</label>
+            <select id="polishType">
+                <option value="formal">正式公文</option>
+                <option value="email">商务邮件</option>
+                <option value="presentation">演讲PPT</option>
+                <option value="report">工作报告</option>
+                <option value="proposal">项目提案</option>
+            </select>
+            <label>✏️ 润色要求</label>
+            <textarea id="polishRequest" placeholder="更简洁/更有说服力/正式一点..."></textarea>
+            <button class="btn" onclick="polishDoc()">✨ 生成润色建议</button>
         </div>
-        <div class="canvas-actions">
-            <button class="clear-btn" onclick="clearCanvas()">清空</button>
-            <button class="save-btn" onclick="saveCanvas()">保存图片</button>
+        
+        <!-- Word/PDF识别 -->
+        <div class="panel" id="panel-extract">
+            <div class="panel-header">
+                <div class="panel-title">📄 Word/PDF 文字识别</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <div class="file-upload" id="fileUpload" onclick="document.getElementById('fileInput').click()">
+                <div style="font-size: 56px; margin-bottom: 16px;">📁</div>
+                <div style="font-size: 20px; color: #333; margin-bottom: 8px;">点击或拖拽文件到此处</div>
+                <div style="color: #666;">支持 .doc, .docx, .pdf 文件</div>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" accept=".doc,.docx,.pdf" onchange="handleFileSelect(event)">
+            <div id="fileInfo" style="display: none; padding: 16px; background: #e7f3ff; border-radius: 8px; margin-top: 16px;">
+                <strong>✅ 已选择：</strong><span id="fileName"></span>
+            </div>
+            <div class="tip">💡 提示：将文件发给虾条（我），可以帮你提取文字！</div>
         </div>
-    </div>
-    
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="showPage('home')">
-            <span class="icon">🏠</span>
-            首页
+        
+        <!-- 大纲生成 -->
+        <div class="panel" id="panel-outline">
+            <div class="panel-header">
+                <div class="panel-title">📋 大纲生成器</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <label>📌 文档主题（必填）</label>
+            <input type="text" id="outlineTopic" placeholder="例如：2026年度工作计划">
+            <label>📝 文档类型</label>
+            <select id="outlineType">
+                <option value="plan">工作计划</option>
+                <option value="report">工作报告</option>
+                <option value="proposal">项目提案</option>
+                <option value="research">调研报告</option>
+                <option value="intro">产品介绍</option>
+            </select>
+            <label>📏 详细程度</label>
+            <select id="outlineLevel">
+                <option value="simple">简洁版</option>
+                <option value="normal">标准版</option>
+                <option value="detailed">详细版</option>
+            </select>
+            <label>💡 特殊要求</label>
+            <textarea id="outlineRequest" placeholder="希望包含xxx部分、侧重xxx方面..."></textarea>
+            <button class="btn" onclick="generateOutline()">✨ 生成大纲</button>
         </div>
+        
+        <!-- 日报助手 -->
+        <div class="panel" id="panel-daily">
+            <div class="panel-header">
+                <div class="panel-title">📅 日报助手</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <div class="row">
+                <div>
+                    <label>📅 日期</label>
+                    <input type="text" id="dailyDate" placeholder="2026.03.11">
+                </div>
+                <div>
+                    <label>👤 姓名</label>
+                    <input type="text" id="dailyName" placeholder="张三">
+                </div>
+            </div>
+            <label>✅ 今日完成（必填）</label>
+            <textarea id="dailyCompleted" placeholder="1. 完成xxx&#10;2. 整理xxx..."></textarea>
+            <label>🔄 今日进行中</label>
+            <textarea id="dailyOngoing" placeholder="xxx项目进行中..."></textarea>
+            <label>📋 明日计划</label>
+            <textarea id="dailyPlan" placeholder="1. 开始xxx&#10;2. 完成xxx..."></textarea>
+            <label>💡 备注</label>
+            <textarea id="dailyNote" placeholder="问题、想法、建议..."></textarea>
+            <button class="btn" onclick="generateDaily()">✨ 生成日报</button>
+        </div>
+        
+        <!-- 思维导图 -->
+        <div class="panel" id="panel-mind">
+            <div class="panel-header">
+                <div class="panel-title">🧠 思维导图生成器</div>
+                <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+            </div>
+            <label>🎯 主题（必填）</label>
+            <input type="text" id="mindTopic" placeholder="例如：新产品发布方案">
+            <label>📝 核心要点（每行一个）</label>
+            <textarea id="mindPoints" placeholder="市场分析&#10;产品功能&#10;推广策略&#10;时间安排"></textarea>
+            <label>📏 展开层级</label>
+            <select id="mindLevel">
+                <option value="2">2层</option>
+                <option value="3">3层</option>
+                <option value="4">4层</option>
+            </select>
+            <button class="btn" onclick="generateMind()">✨ 生成思维导图</button>
+        </div>
+        
+        <!-- 结果显示 -->
+        <div id="result">
+            <h3>📝 生成结果</h3>
+            <div id="resultContent"></div>
+            <div class="btn-group">
+                <button class="btn copy-btn" onclick="copyResult()">📋 复制结果</button>
+                <button class="btn download-btn" onclick="downloadResult()">💾 下载</button>
+            </div>
+        </div>
+        
+        <div class="footer">🦐 虾条文档工具箱 · 让办公更高效</div>
     </div>
 
     <script>
-        // 页面切换
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if (id === 'progress') updateProgress();
-            if (id === '纪念日') render纪念日();
-            if (id === 'todo') renderTodo();
+        let currentResult = '';
+        let currentTitle = '';
+        
+        function showPanel(id) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('panel-' + id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            document.getElementById('result').style.display = 'none';
         }
         
-        // 随机选择
-        function doRandom() {
-            const text = document.getElementById('randomItems').value.trim();
-            if (!text) { alert('请输入选项'); return; }
-            const items = text.split('\n').filter(s => s.trim());
-            if (items.length < 2) { alert('至少需要2个选项'); return; }
-            const result = items[Math.floor(Math.random() * items.length)];
-            const el = document.getElementById('randomResult');
-            el.textContent = result;
-            el.style.display = 'block';
+        function closePanel() {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
         }
         
-        // 天气
-        async function getWeather() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) { alert('请输入城市名'); return; }
+        function showResult(text, title = '文档') {
+            currentResult = text;
+            currentTitle = title;
+            document.getElementById('resultContent').textContent = text;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function copyResult() {
+            navigator.clipboard.writeText(currentResult).then(() => {
+                alert('✅ 已复制到剪贴板！');
+            });
+        }
+        
+        function downloadResult() {
+            const blob = new Blob([currentResult], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (currentTitle || '文档') + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function generateWeekly() {
+            const week = document.getElementById('week').value || '第12周';
+            const date = document.getElementById('weekDate').value || '2026.03.03-03.09';
+            const completed = document.getElementById('weekCompleted').value;
+            if (!completed) { alert('请填写本周完成的工作'); return; }
+            
+            const ongoing = document.getElementById('weekOngoing').value;
+            const todos = document.getElementById('weekTodos').value;
+            const summary = document.getElementById('weekSummary').value;
+            
+            let report = `# ${week} 工作周报\n\n> 📅 ${date}\n\n---\n\n## ✅ 本周完成的工作\n${completed}`;
+            
+            if (ongoing) report += `\n\n---\n\n## 🔄 正在进行的工作\n${ongoing}`;
+            if (todos) report += `\n\n---\n\n## 📋 待办事项\n${todos}`;
+            if (summary) report += `\n\n---\n\n## 💡 总结与反思\n${summary}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, week + '周报');
+        }
+        
+        function generateMeeting() {
+            const title = document.getElementById('meetingTitle').value;
+            const attendees = document.getElementById('meetingAttendees').value;
+            const time = document.getElementById('meetingTime').value;
+            const location = document.getElementById('meetingLocation').value;
+            const agenda = document.getElementById('meetingAgenda').value;
+            const discussion = document.getElementById('meetingDiscussion').value;
+            
+            if (!title || !agenda || !discussion) { alert('请填写会议主题、议题和讨论要点'); return; }
+            
+            const decision = document.getElementById('meetingDecision').value;
+            const tasks = document.getElementById('meetingTasks').value;
+            
+            let report = `# ${title}\n\n---\n\n### 📌 基本信息\n\n| 项目 | 内容 |\n|------|------|\n| 时间 | ${time || '待定'} |\n| 地点 | ${location || '待定'} |\n| 参会 | ${attendees || '全体'} |\n\n---\n\n### 📌 会议议题\n\n${agenda}\n\n---\n\n### 💬 讨论要点\n\n${discussion}`;
+            
+            if (decision) report += `\n\n---\n\n### ✅ 决议事项\n\n${decision}`;
+            if (tasks) report += `\n\n---\n\n### 📋 待办任务\n\n${tasks}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, title + '会议纪要');
+        }
+        
+        let proposalRefText = ''; // 参考资料内容
+        
+        // 方案策划 - 处理参考文件
+        async function handleProposalFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['.doc', '.docx', '.pdf'];
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            
+            if (!validTypes.includes(ext)) {
+                alert('仅支持 .doc, .docx, .pdf 文件');
+                return;
+            }
+            
+            document.getElementById('proposalFileName').textContent = file.name;
+            document.getElementById('proposalFileInfo').style.display = 'block';
+            
+            // 显示加载状态
+            document.getElementById('proposalFileInfo').innerHTML = '<strong>⏳ 正在解析：</strong>' + file.name + '<br><span style="color:#666;">请稍候...</span>';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
             try {
-                const res = await fetch(`https://api.vvhan.com/api/weather?city=${encodeURIComponent(city)}`);
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('temp').textContent = data.data.temp + '°';
-                    document.getElementById('city').textContent = data.data.city;
-                    document.getElementById('desc').textContent = data.data.type + ' ' + data.data.lowest + '~' + data.data.highest;
+                const response = await fetch('http://localhost:3000/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    proposalRefText = result.text;
+                    document.getElementById('proposalFileInfo').innerHTML = '<strong>✅ 已解析：</strong>' + file.name + '<br><span style="color:#666;font-size:12px;">内容已提取，可作为方案参考</span>';
                 } else {
-                    alert('未找到该城市');
+                    alert('解析失败: ' + result.error);
                 }
-            } catch (e) {
-                alert('查询失败');
+            } catch (err) {
+                alert('连接失败，请确保本地服务已启动');
             }
         }
         
-        // 时间进度
-        function updateProgress() {
-            const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 0);
-            const diff = now - start;
-            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const percent = (day / 365 * 100).toFixed(1);
+        function generateProposal() {
+            const name = document.getElementById('proposalName').value;
+            const dept = document.getElementById('proposalDept').value;
+            const goal = document.getElementById('proposalGoal').value;
             
-            document.getElementById('percent').textContent = percent + '%';
-            document.getElementById('yearProgress').textContent = percent + '%';
+            // 如果没有填写背景分析，但上传了参考资料，使用参考资料作为背景
+            let background = document.getElementById('proposalBackground').value;
+            if (!background && proposalRefText) {
+                background = '（参考上传资料）' + proposalRefText.substring(0, 500) + (proposalRefText.length > 500 ? '...' : '');
+            }
             
-            const total = 365 * 24 * 60 * 60 * 1000;
-            const offset = 553 * (1 - day / 365);
-            document.getElementById('progressCircle').style.strokeDashoffset = offset;
+            const strategy = document.getElementById('proposalStrategy').value;
             
-            document.getElementById('timeText').textContent = 
-                now.getHours().toString().padStart(2,'0') + ':' + 
-                now.getMinutes().toString().padStart(2,'0') + ':' + 
-                now.getSeconds().toString().padStart(2,'0');
+            if ((!name || !goal || !strategy) || (!background && !proposalRefText)) { alert('请填写方案名称、目标、策略，以及背景分析（或上传参考资料）'); return; }
+            
+            const plan = document.getElementById('proposalPlan').value;
+            const budget = document.getElementById('proposalBudget').value;
+            const effect = document.getElementById('proposalEffect').value;
+            const risk = document.getElementById('proposalRisk').value;
+            
+            let report = `# ${name}\n\n> 🏢 ${dept || '项目组'}\n\n---\n\n## 🎯 一、方案目标\n\n${goal}\n\n---\n\n## 📊 二、背景分析\n\n${background}\n\n---\n\n## 💪 三、核心策略\n\n${strategy}`;
+            
+            if (plan) report += `\n\n---\n\n## 📅 四、实施计划\n\n${plan}`;
+            if (budget) report += `\n\n---\n\n## 💰 五、预算资源\n\n${budget}`;
+            if (effect) report += `\n\n---\n\n## 📈 六、预期效果\n\n${effect}`;
+            if (risk) report += `\n\n---\n\n## ⚠️ 七、风险预案\n\n${risk}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, name);
         }
         
-        // 纪念日
-        let 纪念日s = JSON.parse(localStorage.getItem('纪念日s') || '[]');
-        function render纪念日() {
-            const list = document.getElementById('纪念日List');
-            list.innerHTML = 纪念日s.map((j, i) => {
-                const days = Math.floor((new Date() - new Date(j.date)) / (1000*60*60*24));
-                return `<div class="纪念日-item">
-                    <div>
-                        <div style="font-weight:bold">${j.name}</div>
-                        <div style="font-size:12px;color:#666">${j.date}</div>
-                    </div>
-                    <div class="纪念日-days">${days}天</div>
-                </div>`;
-            }).join('');
+        function polishDoc() {
+            const original = document.getElementById('polishOriginal').value;
+            if (!original) { alert('请输入需要润色的文案'); return; }
+            
+            const type = document.getElementById('polishType').value;
+            const request = document.getElementById('polishRequest').value;
+            
+            const typeMap = {
+                'formal': '正式公文风格',
+                'email': '商务邮件风格',
+                'presentation': '演讲PPT风格',
+                'report': '工作报告风格',
+                'proposal': '项目提案风格'
+            };
+            
+            let report = `# ✨ 文档润色建议\n\n## 原文\n\n${original}\n\n---\n\n## 润色方向\n\n类型：${typeMap[type]}${request ? '，要求：' + request : ''}\n\n### 1️⃣ 结构优化\n- 调整段落层次，使逻辑更清晰\n- 开头点明主旨，结尾总结\n\n### 2️⃣ 语言精炼\n- 删除冗余表述\n- 使用更有力的动词\n\n### 3️⃣ 专业用语\n- 使用行业术语\n- 保持用语一致\n\n### 4️⃣ 格式规范\n- 标题格式统一\n- 标点符号规范\n\n---\n\n*Generated by 🦐 虾条文档工具箱*`;
+            showResult(report, '文档润色建议');
         }
-        function add纪念日() {
-            const name = prompt('名称：');
-            const date = prompt('日期(YYYY-MM-DD)：');
-            if (name && date) {
-                纪念日s.push({name, date});
-                localStorage.setItem('纪念日s', JSON.stringify(纪念日s));
-                render纪念日();
+        
+        // 文件选择处理 - 调用后端API
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['.doc', '.docx', '.pdf'];
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            
+            if (!validTypes.includes(ext)) {
+                alert('仅支持 .doc, .docx, .pdf 文件');
+                return;
+            }
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').style.display = 'block';
+            
+            // 显示加载状态
+            document.getElementById('fileInfo').innerHTML = '<strong>⏳ 正在解析：</strong>' + file.name + '<br><span style="color:#666;">请稍候...</span>';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const extractResult = `# 📄 文档内容提取
+
+## 文件名
+${result.filename}
+
+---
+
+## 提取内容
+
+${result.text}
+
+---
+
+*Generated by 🦐 虾条文档工具箱*`;
+                    showResult(extractResult, '文档提取');
+                } else {
+                    alert('解析失败: ' + result.error);
+                }
+            } catch (err) {
+                alert('连接失败，请确保本地服务已启动: ' + err.message);
             }
         }
         
-        // 待办
-        let todos = JSON.parse(localStorage.getItem('todos') || '[]');
-        function renderTodo() {
-            document.getElementById('todoList').innerHTML = todos.map((t, i) => `
-                <div class="todo-item ${t.done?'done':''}">
-                    <div class="todo-checkbox" onclick="toggleTodo(${i})"></div>
-                    <span class="text">${t.text}</span>
-                </div>
-            `).join('');
-        }
-        function addTodo() {
-            const text = document.getElementById('todoInput').value.trim();
-            if (text) {
-                todos.push({text, done: false});
-                localStorage.setItem('todos', JSON.stringify(todos));
-                document.getElementById('todoInput').value = '';
-                renderTodo();
-            }
-        }
-        function toggleTodo(i) {
-            todos[i].done = !todos[i].done;
-            localStorage.setItem('todos', JSON.stringify(todos));
-            renderTodo();
-        }
-        
-        // 白板
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false, color = '#000', lastX = 0, lastY = 0;
-        
-        function initCanvas() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
-        canvas.addEventListener('mousedown', e => { drawing = true; [lastX,lastY] = [e.offsetX,e.offsetY]; });
-        canvas.addEventListener('mousemove', e => {
-            if (!drawing) return;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        });
-        canvas.addEventListener('mouseup', () => drawing = false);
-        canvas.addEventListener('touchstart', e => {
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            drawing = true; [lastX,lastY] = [t.clientX-rect.left, t.clientY-rect.top];
-        });
-        canvas.addEventListener('touchmove', e => {
-            if (!drawing) return;
-            e.preventDefault();
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(t.clientX-rect.left, t.clientY-rect.top);
-            ctx.stroke();
-            [lastX, lastY] = [t.clientX-rect.left, t.clientY-rect.top];
-        });
-        canvas.addEventListener('touchend', () => drawing = false);
-        
-        function setColor(c, btn) {
-            color = c;
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        function saveCanvas() {
-            const link = document.createElement('a');
-            link.download = '虾条白板.png';
-            link.href = canvas.toDataURL();
-            link.click();
+        function generateOutline() {
+            const topic = document.getElementById('outlineTopic').value;
+            if (!topic) { alert('请输入文档主题'); return; }
+            
+            const type = document.getElementById('outlineType').value;
+            const level = document.getElementById('outlineLevel').value;
+            const request = document.getElementById('outlineRequest').value;
+            
+            const typeMap = {
+                'plan': '工作计划',
+                'report': '工作报告',
+                'proposal': '项目提案',
+                'research': '调研报告',
+                'intro': '产品介绍'
+            };
+            
+            let report = `# ${topic}\n\n> 类型：${typeMap[type]} | 要求：${request || '标准'}\n\n---\n\n`;
+            
+            const sections = ['概述', '现状分析', '目标设定', '策略方案', '资源需求', '进度安排', '效果预期', '总结'];
+            sections.forEach((s, i) => {
+                report += `### ${i+1}. ${s}\n\n`;
+                if (level !== 'simple') {
+                    report += '- 要点1\n- 要点2\n- 要点3\n\n';
+                }
+            });
+            
+            report += '---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, topic + '大纲');
         }
         
-        // PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        function generateDaily() {
+            const completed = document.getElementById('dailyCompleted').value;
+            if (!completed) { alert('请填写今日完成的工作'); return; }
+            
+            const date = document.getElementById('dailyDate').value || new Date().toLocaleDateString('zh-CN');
+            const name = document.getElementById('dailyName').value;
+            const ongoing = document.getElementById('dailyOngoing').value;
+            const plan = document.getElementById('dailyPlan').value;
+            const note = document.getElementById('dailyNote').value;
+            
+            let report = `# 工作日报\n\n> 📅 ${date} | 👤 ${name || '员工'}\n\n---\n\n## ✅ 今日完成\n${completed}`;
+            
+            if (ongoing) report += `\n\n---\n\n## 🔄 进行中\n${ongoing}`;
+            if (plan) report += `\n\n---\n\n## 📋 明日计划\n${plan}`;
+            if (note) report += `\n\n---\n\n## 💡 备注\n${note}`;
+            
+            report += '\n\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, date + '日报');
+        }
+        
+        function generateMind() {
+            const topic = document.getElementById('mindTopic').value;
+            const points = document.getElementById('mindPoints').value;
+            if (!topic || !points) { alert('请填写主题和核心要点'); return; }
+            
+            const level = document.getElementById('mindLevel').value;
+            const pointList = points.split('\n').filter(p => p.trim());
+            
+            let report = `# 🧠 ${topic}\n\n`;
+            pointList.forEach((p, i) => {
+                report += `\n### ${i+1}. ${p}\n\n`;
+                if (level > 2) {
+                    report += '- 子要点1\n- 子要点2\n';
+                }
+            });
+            
+            report += '\n---\n\n*Generated by 🦐 虾条文档工具箱*';
+            showResult(report, topic + '思维导图');
         }
     </script>
 </body>
